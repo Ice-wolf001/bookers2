@@ -13,8 +13,8 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_out_path_for(resource)
-    root_path
     flash[:notice] = "Sign in successfully."
+    root_path
   end
 
   protected

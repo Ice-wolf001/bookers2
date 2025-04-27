@@ -1,11 +1,12 @@
-class BookersController < ApplicationController
-
+class BooksController < ApplicationController
+  before_action :ensure_correct_user, only: [:edit, :update]
   def create
     @book = Book.new(book_params)
     @book.user_id = current_user.id
     if @book.save
-      redirect_to bookers_path(@book), notice: "successfully"
+      redirect_to book_path(@book), notice: "successfully"
     else
+      flash.now[:alert] = "error"
       @books = Book.all
       render 'index'
     end
@@ -21,23 +22,19 @@ class BookersController < ApplicationController
     @book = Book.find(params[:id])
     @user = @book.user
     @newbook = Book.new
-    @book_comment = BookComment.new
   end
 
   def edit
-    book = Book.find(params[:id])
-    if @book.user == current_user
-      render "edit"
-    else
-      redirect_to books_path
-    end
+    @book = Book.find(params[:id])
   end
 
   def update
+    @book = Book.find(params[:id])
     if @book.update(book_params)
       redirect_to book_path(@book), notice: "successfully."
     else
       render "edit"
+      flash.now[:alert] = "error"
     end
   end
 
@@ -49,8 +46,8 @@ class BookersController < ApplicationController
 
   private
 
-  def bookers_params
-    params.require(:book).permit(:shop_name, :image, :caption)
+  def book_params
+    params.require(:book).permit(:title, :image, :body)
   end
 
   def ensure_correct_user
